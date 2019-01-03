@@ -10,27 +10,21 @@ chai.should();
 chai.use(sinonChai);
 chai.use(chaiAsPromised);
 
-describe('Creating a global dynamodb tables', () => {
-  let serverless, plugin;
-  let createGlobalTables = sinon.stub().resolves();
-  let addReplicas = sinon.stub().resolves();
+let serverless, plugin, createGlobalTables, addReplicas;
 
-  before(async () => {
-    AWSMock.mock('DynamoDB', 'createGlobalTable', createGlobalTables);
-    AWSMock.mock('DynamoDB', 'updateGlobalTable', addReplicas);
-  });
+describe('Creating a global dynamodb tables', () => {
 
   describe('when the stack does not contain any dynamodb tables', () => {
 
     before(async () => {
+      given_aws_dynamodb_is_mocked();
       serverless = given_a_serverless_stack_without_any_tables();
       plugin = new CreateDynamoDBGlobalTables(serverless);
       await plugin.createGlobalTables();
     });
 
     after(() => {
-      createGlobalTables.reset();
-      addReplicas.reset();
+      AWSMock.restore();
     });
 
     it('does not create any global tables', () => {
@@ -45,18 +39,14 @@ describe('Creating a global dynamodb tables', () => {
   describe('when the stack contains dynamodb tables that have not yet been deployed', () => {
 
     before(async () => {
-      let createGlobalTables = sinon.stub().resolves();
-      let addReplicas = sinon.stub().resolves();
-      AWSMock.mock('DynamoDB', 'createGlobalTable', createGlobalTables);
-      AWSMock.mock('DynamoDB', 'updateGlobalTable', addReplicas);
+      given_aws_dynamodb_is_mocked();
       serverless = given_a_serverless_stack_with_some_tables();
       plugin = new CreateDynamoDBGlobalTables(serverless);
       await plugin.createGlobalTables();
     });
 
     after(() => {
-      createGlobalTables.reset();
-      addReplicas.reset();
+      AWSMock.restore();
     });
 
     it('creates a global table for all table resource', () => {
@@ -81,15 +71,15 @@ describe('Creating a global dynamodb tables', () => {
   describe('when the dynamodb global table already exists', () => {
 
     before(async () => {
-      serverless = given_a_serverless_stack_with_some_tables();
+      given_aws_dynamodb_is_mocked();
       createGlobalTables.rejects({ code: 'GlobalTableAlreadyExistsException' });
+      serverless = given_a_serverless_stack_with_some_tables();
       plugin = new CreateDynamoDBGlobalTables(serverless);
       await plugin.createGlobalTables();
     });
 
     after(() => {
-      createGlobalTables.reset();
-      addReplicas.reset();
+      AWSMock.restore();
     });
 
     it('adds a replica table for all table resource', () => {
@@ -118,15 +108,15 @@ describe('Creating a global dynamodb tables', () => {
   describe('when the replication group already exists', () => {
 
     before(async () => {
-      serverless = given_a_serverless_stack_with_some_tables();
+      given_aws_dynamodb_is_mocked();
       addReplicas.rejects({ code: 'ReplicaAlreadyExistsException' });
+      serverless = given_a_serverless_stack_with_some_tables();
       plugin = new CreateDynamoDBGlobalTables(serverless);
       await plugin.createGlobalTables();
     });
 
     after(() => {
-      createGlobalTables.reset();
-      addReplicas.reset();
+      AWSMock.restore();
     });
 
     it('attempts to add a replica table for all table resource', () => {
@@ -137,14 +127,14 @@ describe('Creating a global dynamodb tables', () => {
   describe('when an exception occurs creating the global table', () => {
 
     before(async () => {
-      serverless = given_a_serverless_stack_with_some_tables();
+      given_aws_dynamodb_is_mocked();
       createGlobalTables.rejects({ code: 'UnhandledException' });
+      serverless = given_a_serverless_stack_with_some_tables();
       plugin = new CreateDynamoDBGlobalTables(serverless);
     });
 
     after(() => {
-      createGlobalTables.reset();
-      addReplicas.reset();
+      AWSMock.restore();
     });
 
     it('throws an exception', () => {
@@ -155,14 +145,14 @@ describe('Creating a global dynamodb tables', () => {
   describe('when an exception occurs adding a replica table', () => {
 
     before(async () => {
-      serverless = given_a_serverless_stack_with_some_tables();
+      given_aws_dynamodb_is_mocked();
       addReplicas.rejects({ code: 'UnhandledException' });
+      serverless = given_a_serverless_stack_with_some_tables();
       plugin = new CreateDynamoDBGlobalTables(serverless);
     });
 
     after(() => {
-      createGlobalTables.reset();
-      addReplicas.reset();
+      AWSMock.restore();
     });
 
     it('throws an exception', () => {
@@ -171,6 +161,12 @@ describe('Creating a global dynamodb tables', () => {
   });
 });
 
+const given_aws_dynamodb_is_mocked = () => {
+  createGlobalTables = sinon.stub().resolves();
+  addReplicas = sinon.stub().resolves();
+  AWSMock.mock('DynamoDB', 'createGlobalTable', createGlobalTables);
+  AWSMock.mock('DynamoDB', 'updateGlobalTable', addReplicas);
+};
 
 const given_a_serverless_stack_without_any_tables = () => ({
   getProvider: () => ({ getRegion: () => 'eu-west-2' }),

@@ -1,14 +1,15 @@
 # Serverless Create DynamoDB Global Tables For CF Stack
 
-A Serverless v1.x plugin that will add a global table and replica region for all tables deployed in a serverless stack.
+A Serverless plugin that will add a global table and replica region for all tables deployed in a serverless stack.
 
 DynamoDB currently imposes some strict limitations when [creating global tables](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/globaltables_reqs_bestpractices.html):
 - The table provisioning settings must match for each regional table
 - The table names must match
 - Streams must be enabled
 - All tables must be empty
+- If a replica table is removed from a global table it can not be readded. You can however drop the table and recreate it to add it to global replication.
 
-The plugin handles these limitation by leaving table creation / deletion to your serverles stack resources and only adding and removing tables from a replication group as the corresponfing stack resource is added and removed in each region. All tables in the stack will be added to global replication.
+The plugin handles these limitation by enabling global replication for all tables defined in the serverless stack and thus tying the global tables lifecycle to the table resources defined in the stack. Adding and removing tables from the stack will add and remove them from replication.
 
 ## Install
 
