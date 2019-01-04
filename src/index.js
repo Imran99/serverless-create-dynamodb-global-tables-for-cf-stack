@@ -1,17 +1,24 @@
 const AWS = require('aws-sdk');
 const _values = require('lodash.values');
+const _get = require('lodash.get');
 const chalk = require('chalk');
 
 class CreateDynamoDBGlobalTables {
   constructor(serverless, options) {
     this.serverless = serverless;
     this.options = options;
+    this.enabled = _get(serverless, 'service.custom.dynamoDBGlobalTables.enabled', true);
     this.hooks = {
       'after:deploy:deploy': this.createGlobalTables.bind(this),
     };
   }
 
   async createGlobalTables() {
+    if(this.enabled == false) {
+      this.log('Plugin disabled');
+      return;
+    }
+
     const provider = this.serverless.getProvider('aws');
     const region = provider.getRegion();
     const tableNames = this.getTableNames();

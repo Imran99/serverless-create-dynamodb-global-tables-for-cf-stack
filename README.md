@@ -7,7 +7,7 @@ DynamoDB currently imposes some strict limitations when [creating global tables]
 - The table names must match
 - Streams must be enabled
 - All tables must be empty
-- If a replica table is removed from a global table it can not be readded. You can however drop the table and recreate it to add it to global replication.
+- If a replica table is removed from a global table it can not be added again. You can however drop the table and recreate it to add it to global replication.
 
 The plugin handles these limitation by enabling global replication for all tables defined in the serverless stack and thus tying the global tables lifecycle to the table resources defined in the stack. Adding and removing tables from the stack will add and remove them from replication.
 
@@ -34,3 +34,15 @@ serverless deploy --region eu-west-1
 ```
 
 When you add/remove table resources from your serverless stack they will also be added/removed from global replication but you will need to redeploy your stack to each region.
+
+## Disabling
+
+The plugin is enabled by default. You can disable the plugin via config. You may want to do this in certain environments for example.
+
+```yml
+custom:
+  createDynamoDBGlobalTables:
+    enabled: ${self:custom.variables.${self:custom.variables.stage}.enabled}
+```
+
+Disabling the plugin after deploying the stack will have no effect on global tables that were previously deployed. This is due to the previously mentioned limitations of dyanmodb global tables.

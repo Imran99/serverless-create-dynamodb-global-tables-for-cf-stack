@@ -159,6 +159,28 @@ describe('Creating a global dynamodb tables', () => {
       plugin.createGlobalTables().should.be.rejected;
     });
   });
+
+  describe('when the plugin is disabled', () => {
+
+    before(async () => {
+      given_aws_dynamodb_is_mocked();
+      serverless = given_the_plugin_is_disabled();
+      plugin = new CreateDynamoDBGlobalTables(serverless);
+      await plugin.createGlobalTables();
+    });
+
+    after(() => {
+      AWSMock.restore();
+    });
+
+    it('does not create any global tables', () => {
+      createGlobalTables.should.not.have.been.called;
+    });
+
+    it('does not add any replicas', () => {
+      addReplicas.should.not.have.been.called;
+    });
+  });
 });
 
 const given_aws_dynamodb_is_mocked = () => {
@@ -198,6 +220,18 @@ const given_a_serverless_stack_with_some_tables = () => ({
             TableName: 'table-two'
           }
         }
+      }
+    }
+  }
+});
+
+const given_the_plugin_is_disabled = () => ({
+  getProvider: () => ({ getRegion: () => 'eu-west-2' }),
+  cli: { consoleLog: () => { } },
+  service: {
+    custom: {
+      dynamoDBGlobalTables : {
+        enabled: false
       }
     }
   }
