@@ -1,0 +1,38 @@
+{
+  "name": "serverless-create-dynamodb-global-tables-for-cf-stack",
+  "version": "1.0.0",
+  "description": "A Serverless plugin that will add a global table and replica region for all tables deployed in a serverless stack.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha test -t 4000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Imran99/serverless-create-dynamodb-global-tables-for-cf-stack.git"
+  },
+  "keywords": [
+    "serverless",
+    "dynamodb"
+  ],
+  "author": "imran99",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Imran99/serverless-create-dynamodb-global-tables-for-cf-stack/issues"
+  },
+  "homepage": "https://github.com/Imran99/serverless-create-dynamodb-global-tables-for-cf-stack#readme",
+  "dependencies": {
+    "aws-sdk": "^2.382.0",
+    "chalk": "^2.4.1",
+    "lodash.get": "^4.4.2",
+    "lodash.values": "^4.3.0"
+  },
+  "devDependencies": {
+    "aws-sdk-mock": "^4.3.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^5.6.0",
+    "mocha": "^5.2.0",
+    "sinon": "^7.2.2",
+    "sinon-chai": "^3.3.0"
+  }
+}
