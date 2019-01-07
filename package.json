@@ -1,6 +1,6 @@
 {
   "name": "serverless-create-dynamodb-global-tables-for-cf-stack",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Serverless plugin that will add a global table and replica region for all tables deployed in a serverless stack.",
   "main": "src/index.js",
   "scripts": {
